@@ -4,19 +4,35 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        brand: {
-          green: {
-            50: "#ecfdf3",
-            100: "#d1fae5",
-            400: "#4ade80",
-            500: "#34C759", 
-            600: "#16a34a",
-          },
-          blue: {
-            400: "#4f63d2",
-            500: "#1E2A78", 
-            600: "#162060",
-          },
+        primary: "#32b327",
+        primaryForeground: "#68b560",
+        clarity: {
+          green: "#32b327",
+          lightGreen: "#68b560",
+          charcoal: "#2d2d2d",
+        },
+      },
+      fontFamily: {
+        display: ["Clash Display", "Inter", "sans-serif"],
+        body: ["Inter", "system-ui", "sans-serif"],
+      },
+      animation: {
+        "fade-in": "fadeIn 0.8s ease-out forwards",
+        "slide-up": "slideUp 0.6s ease-out forwards",
+        "float": "float 6s ease-in-out infinite",
+      },
+      keyframes: {
+        fadeIn: {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        slideUp: {
+          "0%": { transform: "translateY(30px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-20px)" },
         },
       },
     },

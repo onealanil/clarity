@@ -2,10 +2,3 @@
 @tailwind components;
 @tailwind utilities;
 
-.nav-link {
-  @apply text-gray-300 hover:text-brand-green-400 transition;
-}
-
-.mobile-link {
-  @apply block w-full text-left py-2 text-gray-300 hover:text-brand-green-400;
-}
