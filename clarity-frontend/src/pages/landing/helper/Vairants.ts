@@ -25,3 +25,14 @@ export const cardVariants: Variants = {
     },
   }),
 };
+
+export const dotVariants: Variants = {
+  animate: {
+    y: ["0%", "-50%", "0%"],
+    transition: {
+      duration: 0.6,
+      ease: "easeInOut",
+      repeat: Infinity,
+    },
+  },
+};

@@ -8,6 +8,8 @@ export interface IUser{
     email: string;
     password: string,
     refresh_token: string;
+    monthly_income?: number;
+    goal?: string;
     createdAt?: Date;
     updatedAt?: Date;
 }

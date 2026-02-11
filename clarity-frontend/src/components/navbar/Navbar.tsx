@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 function Navbar() {
     return (
-        <nav className="relative z-10 flex justify-center md:justify-between items-center px-8 md:px-16 py-8">
+        <nav className="relative z-10 flex justify-center md:justify-between items-center px-8 md:px-16 pt-1 pb-8">
             <div className="flex items-center space-x-2">
                 <img src="/assets/images/claritylogo.png" alt="Clarity Logo" className="w-36 h-20" />
             </div>

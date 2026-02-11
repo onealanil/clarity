@@ -28,7 +28,7 @@ const Login = (): React.ReactElement => {
 
       setAuth(user, accessToken);
       toast.success("Logged in successfully!");
-      navigate("/dashboard");
+      navigate("/onboarding");
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Login failed");
     }

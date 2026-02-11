@@ -18,6 +18,8 @@ declare global {
                 _id?: string;
                 username?: string;
                 email?: string;
+                monthly_income?: number;
+                goal?: string,
                 createdAt?: Date;
                 updatedAt?: Date;
             };

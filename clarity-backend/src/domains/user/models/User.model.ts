@@ -30,6 +30,15 @@ const UserSchema = new Schema({
     refresh_token: {
         type: String,
         default: null,
+    },
+    monthly_income: {
+        type: Number,
+        default: null,
+    },
+    goal: {
+        type: String,
+        enum: ["Awareness", "Control", "Peace"],
+        default: null,
     }
 },
     { timestamps: true }

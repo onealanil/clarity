@@ -29,13 +29,17 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const { data } = await axios.post(
-          `${baseURL}/auth/refresh-token`,
-          {},
+        const { data } = await axios.get(
+          `${baseURL}refresh-token`,
           { withCredentials: true }
         );
 
         const { accessToken } = data;
+        const currentUser = useAuthStore.getState().user;
+        if (currentUser) {
+          useAuthStore.getState().setAuth(currentUser, accessToken);
+        }
+
         useAuthStore.getState().setAuth(useAuthStore.getState().user!, accessToken);
 
         if (originalRequest.headers) {
