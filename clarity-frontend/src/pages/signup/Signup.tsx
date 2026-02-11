@@ -1,54 +1,93 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import toast, { Toaster } from "react-hot-toast";
+import axiosInstance from "../../utils/axios";
+import { useAuthStore } from "../../store/useAuthStore";
+import { SignupFormData } from "../../interfaces/auth/Auth";
+import { signupSchema } from "../../validation/auth/signupSchema";
 
-const Signup = (): React.ReactElement => {
+const Signup: React.FC = () => {
   const navigate = useNavigate();
+  const setAuth = useAuthStore((state) => state.setAuth);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupFormData>({
+    resolver: yupResolver(signupSchema),
+  });
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: SignupFormData) => {
+    try {
+      const response = await axiosInstance.post("/signup", data);
+      const { user, accessToken } = response.data;
+
+      setAuth(user, accessToken);
+
+      toast.success("Signup successful!, redirecting to login...");
+      setTimeout(() => navigate('/login'), 2000);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Signup failed");
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="bg-white p-10 rounded-3xl w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-stone-50">
+      <Toaster position="top-right" />
+      <div className="bg-white p-10 rounded-3xl w-full max-w-md shadow-lg">
         <h2 className="text-3xl font-bold mb-8 text-center text-clarity-charcoal">
           Create Account
         </h2>
 
-        <form onSubmit={handleRegister} className="space-y-5">
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-clarity-green/50 transition"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <div>
+            <input
+              type="text"
+              placeholder="Username"
+              {...register("username")}
+              className={`w-full p-4 border rounded-xl focus:ring-2 focus:ring-clarity-green/50 ${errors.username ? "border-red-500" : ""
+                }`}
+            />
+            {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>}
+          </div>
 
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-clarity-green/50 transition"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div>
+            <input
+              type="email"
+              placeholder="Email"
+              {...register("email")}
+              className={`w-full p-4 border rounded-xl focus:ring-2 focus:ring-clarity-green/50 ${errors.email ? "border-red-500" : ""
+                }`}
+            />
+            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+          </div>
+
+          <div>
+            <input
+              type="password"
+              placeholder="Password"
+              {...register("password")}
+              className={`w-full p-4 border rounded-xl focus:ring-2 focus:ring-clarity-green/50 ${errors.password ? "border-red-500" : ""
+                }`}
+            />
+            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+          </div>
 
           <button
             type="submit"
-            className="w-full bg-clarity-green hover:bg-clarity-lightGreen text-white font-semibold py-3 rounded-xl shadow-md hover:shadow-lg transition"
+            disabled={isSubmitting}
+            className="w-full bg-clarity-green text-white py-3 rounded-xl hover:opacity-90 transition"
           >
-            Sign Up
+            {isSubmitting ? "Signing up..." : "Sign Up"}
           </button>
         </form>
 
         <p className="text-sm text-center mt-6 text-clarity-charcoal">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            className="text-clarity-green font-semibold hover:underline"
-          >
+          <Link to="/login" className="text-clarity-green font-semibold hover:underline">
             Login
           </Link>
         </p>

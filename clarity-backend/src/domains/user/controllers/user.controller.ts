@@ -8,6 +8,8 @@ import { StatusCodes } from "http-status-codes";
 import logger from "../../../utils/logger";
 import jwt from "jsonwebtoken";
 import createError from "../../../utils/createError";
+import { hashPassword } from "../../../utils/bcryptHash";
+import { SignupInput } from "../validators/signup.validator";
 
 /**
  * @function LoginUser
@@ -65,6 +67,42 @@ export const LoginUser = catchAsync(async (req: Request<{}, {}, LoginInput>, res
         logger.info(`User logged in successfully: ${user.email}`);
 
 });
+
+
+export const signupUser = catchAsync(async (req: Request<{}, {}, SignupInput>, res: Response) => {
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+        throw createError(StatusCodes.UNPROCESSABLE_ENTITY, "Username, email, and password are required.");
+    }
+
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+        logger.warn(`Signup attempt failed: Email or username already exists: ${email}`);
+        throw createError(StatusCodes.CONFLICT, "Email or username already exists.");
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    const user = await User.create({
+        username,
+        email,
+        password: hashedPassword,
+    });
+
+    logger.info(`New user signed up: ${user.email}`);
+
+    return res.status(StatusCodes.CREATED).json({
+        status: "success",
+        message: "Account created successfully.",
+        user: {
+            id: user._id,
+            username: user.username,
+            email: user.email,
+        },
+    });
+});
+
 
 /**
  * @function logoutUser
