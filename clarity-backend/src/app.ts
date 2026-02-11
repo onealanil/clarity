@@ -11,6 +11,7 @@ import cookieParser from "cookie-parser";
 import { Request, Response } from "express";
 import { notFoundHandler } from "./utils/notFound.error";
 import { errorHandler } from "./utils/errorHandler";
+import userRoute from "../src/domains/user/routes/user.route";
 import helmet from "helmet";
 
 const app = express();
@@ -66,6 +67,9 @@ app.use(cookieParser());
 app.get("/", (req: Request, res: Response) => {
   res.send("Welcome to the Clarity API");
 })
+
+//Auth --> user
+app.use("/api/v1", userRoute)
 
 //handle not found routes
 app.use(notFoundHandler);
