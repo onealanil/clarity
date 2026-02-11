@@ -1,6 +1,6 @@
 # Clarity Expense Tracker
 
-# Tools and package, I am going to used
+# Tools and package, I am going to used for backend
 
 ```typescript
  Overview: A RESTful Clarity API built with:
