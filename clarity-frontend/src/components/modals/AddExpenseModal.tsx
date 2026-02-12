@@ -1,29 +1,9 @@
 import { useState } from "react";
-import { X, DollarSign, Tag, FileText, Smile, Meh, Frown, AlertCircle } from "lucide-react";
-import * as Yup from "yup";
-
-interface AddExpenseModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onAddExpense: (expense: {
-    amount: number;
-    category: string;
-    description: string;
-    mood: "Worth It" | "Neutral" | "Regret";
-  }) => void;
-}
-
-const expenseSchema = Yup.object().shape({
-  amount: Yup.number()
-    .required("Amount is required")
-    .positive("Amount must be positive")
-    .max(1000000, "Amount seems too large"),
-  category: Yup.string().required("Please select a category"),
-  description: Yup.string().max(200, "Description is too long"),
-  mood: Yup.string()
-    .oneOf(["Worth It", "Neutral", "Regret"])
-    .required("Please select how you feel about this purchase"),
-});
+import { X, FileText, AlertCircle } from "lucide-react";
+import { expenseSchema } from "../../validation/expenses/expenseSchema";
+import { AddExpenseModalProps } from "../../interfaces/expense/IExpense";
+import { categories } from "../../utils/add-expense/categories";
+import { moods } from "../../utils/add-expense/moods";
 
 const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   isOpen,
@@ -59,7 +39,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    
+
     const formData = {
       amount: Number(amount),
       category,
@@ -69,9 +49,9 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
 
     try {
       await expenseSchema.validate(formData, { abortEarly: false });
-      
+
       onAddExpense(formData);
-      
+
       setAmount("");
       setCategory("");
       setDescription("");
@@ -107,39 +87,6 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
     onClose();
   };
 
-  const moods = [
-    {
-      value: "Worth It",
-      icon: Smile,
-      color: "text-clarity-green",
-      bg: "bg-clarity-green/10",
-      activeBg: "bg-clarity-green",
-    },
-    {
-      value: "Neutral",
-      icon: Meh,
-      color: "text-amber-500",
-      bg: "bg-amber-500/10",
-      activeBg: "bg-amber-500",
-    },
-    {
-      value: "Regret",
-      icon: Frown,
-      color: "text-rose-500",
-      bg: "bg-rose-500/10",
-      activeBg: "bg-rose-500",
-    },
-  ];
-
-  const categories = [
-    "Food & Dining",
-    "Shopping",
-    "Transportation",
-    "Entertainment",
-    "Bills & Utilities",
-    "Health",
-    "Other",
-  ];
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
@@ -166,16 +113,15 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
             </label>
             <div className="relative">
               <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                <DollarSign className="w-5 h-5 text-stone-400" />
+                <span className="w-5 h-5 text-stone-400" >R.S </span> 
               </div>
               <input
                 type="number"
                 placeholder="0.00"
-                className={`w-full border-2 rounded-2xl pl-12 pr-4 py-3 text-lg font-body focus:outline-none transition-colors ${
-                  touched.amount && errors.amount
-                    ? "border-rose-500 focus:border-rose-500"
-                    : "border-stone-200 focus:border-clarity-green"
-                }`}
+                className={`w-full border-2 rounded-2xl pl-12 pr-4 py-3 text-lg font-body focus:outline-none transition-colors ${touched.amount && errors.amount
+                  ? "border-rose-500 focus:border-rose-500"
+                  : "border-stone-200 focus:border-clarity-green"
+                  }`}
                 value={amount}
                 onChange={(e) => {
                   const value = e.target.value === "" ? "" : Number(e.target.value);
@@ -207,13 +153,12 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
                 <button
                   key={cat}
                   type="button"
-                  className={`px-4 py-3 rounded-xl border-2 font-body text-sm transition-all ${
-                    category === cat
-                      ? "border-clarity-green bg-clarity-green/10 text-clarity-green font-medium"
-                      : touched.category && errors.category
+                  className={`px-4 py-3 rounded-xl border-2 font-body text-sm transition-all ${category === cat
+                    ? "border-clarity-green bg-clarity-green/10 text-clarity-green font-medium"
+                    : touched.category && errors.category
                       ? "border-rose-500 text-stone-600 hover:border-rose-400"
                       : "border-stone-200 text-stone-600 hover:border-stone-300"
-                  }`}
+                    }`}
                   onClick={() => {
                     setCategory(cat);
                     setTouched((prev) => ({ ...prev, category: true }));
@@ -243,11 +188,10 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
               <input
                 type="text"
                 placeholder="What did you buy?"
-                className={`w-full border-2 rounded-2xl pl-12 pr-4 py-3 font-body focus:outline-none transition-colors ${
-                  touched.description && errors.description
-                    ? "border-rose-500 focus:border-rose-500"
-                    : "border-stone-200 focus:border-clarity-green"
-                }`}
+                className={`w-full border-2 rounded-2xl pl-12 pr-4 py-3 font-body focus:outline-none transition-colors ${touched.description && errors.description
+                  ? "border-rose-500 focus:border-rose-500"
+                  : "border-stone-200 focus:border-clarity-green"
+                  }`}
                 value={description}
                 onChange={(e) => {
                   setDescription(e.target.value);
@@ -280,13 +224,12 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
                   <button
                     key={m.value}
                     type="button"
-                    className={`p-4 rounded-2xl border-2 transition-all ${
-                      mood === m.value
-                        ? `${m.activeBg} border-transparent text-white shadow-lg`
-                        : touched.mood && errors.mood
+                    className={`p-4 rounded-2xl border-2 transition-all ${mood === m.value
+                      ? `${m.activeBg} border-transparent text-white shadow-lg`
+                      : touched.mood && errors.mood
                         ? "border-rose-500 hover:border-rose-400"
                         : "border-stone-200 hover:border-stone-300"
-                    }`}
+                      }`}
                     onClick={() => {
                       setMood(m.value as "Worth It" | "Neutral" | "Regret");
                       setTouched((prev) => ({ ...prev, mood: true }));
@@ -294,14 +237,12 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
                     }}
                   >
                     <Icon
-                      className={`w-8 h-8 mx-auto mb-2 ${
-                        mood === m.value ? "text-white" : m.color
-                      }`}
+                      className={`w-8 h-8 mx-auto mb-2 ${mood === m.value ? "text-white" : m.color
+                        }`}
                     />
                     <div
-                      className={`text-xs font-body font-medium ${
-                        mood === m.value ? "text-white" : "text-stone-600"
-                      }`}
+                      className={`text-xs font-body font-medium ${mood === m.value ? "text-white" : "text-stone-600"
+                        }`}
                     >
                       {m.value}
                     </div>

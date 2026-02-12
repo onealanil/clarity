@@ -12,6 +12,7 @@ import { Request, Response } from "express";
 import { notFoundHandler } from "./utils/notFound.error";
 import { errorHandler } from "./utils/errorHandler";
 import userRoute from "../src/domains/user/routes/user.route";
+import expenseRoute from "../src/domains/expense/routes/expense.route";
 import helmet from "helmet";
 
 const app = express();
@@ -54,6 +55,9 @@ app.get("/", (req: Request, res: Response) => {
 
 //Auth --> user
 app.use("/api/v1", userRoute)
+
+//Expense
+app.use("/api/v1/expenses", expenseRoute)
 
 //handle not found routes
 app.use(notFoundHandler);

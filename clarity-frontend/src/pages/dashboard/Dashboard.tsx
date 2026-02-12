@@ -6,14 +6,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import axiosInstance from "../../utils/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useExpenseStore } from "../../store/useExpenseStore";
 
 const Dashboard = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuthStore();
+    const { expenses, fetchExpenses, addExpense, clearExpenses } = useExpenseStore();
 
-    const [expenses, setExpenses] = useState<
-        { amount: number; category: string; description: string; mood: "Worth It" | "Neutral" | "Regret" }[]
-    >([]);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [openMenu, setOpenMenu] = useState<boolean>(false);
 
@@ -33,17 +32,23 @@ const Dashboard = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    useEffect(() => {
+        fetchExpenses();
+    }, []);
+
+
     const totalSpent = expenses.reduce((sum, exp) => sum + exp.amount, 0);
     const spendingPercentage = Math.min((totalSpent / (user?.monthly_income || 1)) * 100, 100);
 
-    const handleAddExpense = (expense: {
+    const handleAddExpense = async (expense: {
         amount: number;
         category: string;
         description: string;
         mood: "Worth It" | "Neutral" | "Regret";
     }) => {
-        setExpenses([...expenses, expense]);
+        await addExpense(expense);
     };
+
 
     const regretCategories = expenses.reduce((acc: any, exp) => {
         if (exp.mood === "Regret") {
@@ -64,6 +69,7 @@ const Dashboard = () => {
             if (res.status === 200) {
                 toast.success("Logged out successfully");
                 logout();
+                clearExpenses();
                 navigate("/login", { replace: true });
             } else {
                 toast.error("Logout failed");
