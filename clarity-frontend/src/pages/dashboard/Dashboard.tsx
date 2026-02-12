@@ -36,7 +36,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         fetchExpenses();
-    }, []);
+    }, [fetchExpenses]);
 
 
     const totalSpent = expenses.reduce((sum, exp) => sum + exp.amount, 0);

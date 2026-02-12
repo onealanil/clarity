@@ -19,7 +19,7 @@ export const useBootstrapAuth = () => {
         };
 
         initAuth();
-    }, []);
+    }, [logout, setAuth]);
 
     return loading;
 };
