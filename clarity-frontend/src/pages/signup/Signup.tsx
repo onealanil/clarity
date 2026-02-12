@@ -35,9 +35,9 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-stone-50">
+    <div className="min-h-screen flex items-center justify-center">
       <Toaster position="top-right" />
-      <div className="bg-white p-10 rounded-3xl w-full max-w-md shadow-lg">
+      <div className="bg-white p-10 rounded-3xl w-full max-w-md">
         <h2 className="text-3xl font-bold mb-8 text-center text-clarity-charcoal">
           Create Account
         </h2>

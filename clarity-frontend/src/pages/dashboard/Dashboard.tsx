@@ -1,22 +1,40 @@
-import { useState } from "react";
-import { TrendingUp, Tag, Heart, Plus, Sparkles, Target, Smile } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { TrendingUp, Tag, Heart, Plus, Sparkles, Target, Smile, LogOut, User } from "lucide-react";
 import AddExpenseModal from "../../components/modals/AddExpenseModal";
 import { useAuthStore } from "../../store/useAuthStore";
+import { AnimatePresence, motion } from "framer-motion";
+import axiosInstance from "../../utils/axios";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+    const navigate = useNavigate();
+    const { user, logout } = useAuthStore();
+
     const [expenses, setExpenses] = useState<
         { amount: number; category: string; description: string; mood: "Worth It" | "Neutral" | "Regret" }[]
     >([]);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [openMenu, setOpenMenu] = useState<boolean>(false);
 
-    const {user } = useAuthStore();
-    console.log("Logged in user:", user);
+    const menuRef = useRef<HTMLDivElement>(null);
 
-    const monthlyIncome = 30000;
-    const goal: "Awareness" | "Control" | "Peace" = "Awareness";
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                menuRef.current &&
+                !menuRef.current.contains(event.target as Node)
+            ) {
+                setOpenMenu(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     const totalSpent = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-    const spendingPercentage = Math.min((totalSpent / monthlyIncome) * 100, 100);
+    const spendingPercentage = Math.min((totalSpent / (user?.monthly_income || 1)) * 100, 100);
 
     const handleAddExpense = (expense: {
         amount: number;
@@ -39,30 +57,83 @@ const Dashboard = () => {
         return acc;
     }, {});
 
+    async function handleLogout() {
+        try {
+            const res = await axiosInstance.get("/logout", { withCredentials: true });
+
+            if (res.status === 200) {
+                toast.success("Logged out successfully");
+                logout();
+                navigate("/login", { replace: true });
+            } else {
+                toast.error("Logout failed");
+            }
+
+
+        } catch (err: any) {
+            toast.error(err.response?.data?.message || "Logout failed");
+        }
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-stone-50 via-green-50/20 to-stone-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="mb-12 animate-fade-in">
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-clarity-green to-clarity-lightGreen flex items-center justify-center">
-                            <Sparkles className="w-6 h-6 text-white" />
+                <div className="mb-12 animate-fade-in flex items-start justify-between">
+                    <div>
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-clarity-green to-clarity-lightGreen flex items-center justify-center">
+                                <Sparkles className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl flex gap-x-2 flex-col md:flex-row md:text-3xl lg:text-4xl font-display font-semibold text-clarity-charcoal">
+                                    Welcome back, <span>{user?.username || "User"}</span>
+                                </h1>
+                            </div>
                         </div>
-                        <div>
-                            <h1 className="text-4xl font-display font-semibold text-clarity-charcoal">
-                                Welcome back, Anil
-                            </h1>
+
+                        <p className="text-stone-600 text-lg font-body ml-15">
+                            Your journey to financial clarity continues
+                        </p>
+
+                        <div className="inline-flex items-center gap-2 mt-3 ml-15 px-4 py-2 bg-clarity-green/10 rounded-full">
+                            <Target className="w-4 h-4 text-clarity-green" />
+                            <span className="text-sm font-body font-medium text-clarity-green">
+                                Goal: {user?.goal || "Set your financial goal in profile settings"}
+                            </span>
                         </div>
                     </div>
-                    <p className="text-stone-600 text-lg font-body ml-15">
-                        Your journey to financial clarity continues
-                    </p>
-                    <div className="inline-flex items-center gap-2 mt-3 ml-15 px-4 py-2 bg-clarity-green/10 rounded-full">
-                        <Target className="w-4 h-4 text-clarity-green" />
-                        <span className="text-sm font-body font-medium text-clarity-green">
-                            Goal: {goal}
-                        </span>
+
+                    <div className="relative" ref={menuRef}>
+                        <button
+                            onClick={() => setOpenMenu(prev => !prev)}
+                            className="w-10 h-10 rounded-full bg-stone-200 flex items-center justify-center hover:bg-stone-300 transition"
+                        >
+                            <User className="w-5 h-5 text-stone-700" />
+                        </button>
+
+                        <AnimatePresence>
+                            {openMenu && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="absolute right-0 mt-3 w-44 bg-white shadow-xl rounded-2xl border border-stone-100 overflow-hidden z-50"
+                                >
+                                    <button
+                                        onClick={handleLogout}
+                                        className="flex items-center gap-3 w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition"
+                                    >
+                                        <LogOut className="w-4 h-4" />
+                                        Logout
+                                    </button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
+
                 </div>
+
 
                 {expenses.length === 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up">
@@ -83,7 +154,7 @@ const Dashboard = () => {
                                     ₹0
                                 </span>
                                 <span className="text-sm font-body text-stone-400">
-                                    of ₹{monthlyIncome.toLocaleString()}
+                                    of ₹{user?.monthly_income.toLocaleString()}
                                 </span>
                             </div>
                             <p className="text-stone-400 text-sm font-body leading-relaxed">
@@ -157,7 +228,7 @@ const Dashboard = () => {
                                     ₹{totalSpent.toLocaleString()}
                                 </span>
                                 <span className="text-sm font-body text-stone-500">
-                                    of ₹{monthlyIncome.toLocaleString()}
+                                    of ₹{user?.monthly_income.toLocaleString()}
                                 </span>
                             </div>
                             <p className="text-stone-600 text-sm font-body">

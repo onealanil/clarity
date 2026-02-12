@@ -2,6 +2,8 @@ export interface User {
   id: string;
   email: string;
   username: string;
+  monthly_income: number;
+  goal: "Awareness" | "Control" | "Peace";
 }
 
 export interface AuthState {

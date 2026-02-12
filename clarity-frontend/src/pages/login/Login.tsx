@@ -35,8 +35,8 @@ const Login = (): React.ReactElement => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-stone-50 p-4">
-      <div className="bg-white p-10 rounded-3xl w-full max-w-md shadow-lg">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="bg-white p-10 rounded-3xl w-full max-w-md ">
         <h2 className="text-3xl font-bold mb-8 text-center text-clarity-charcoal">
           Welcome Back
         </h2>

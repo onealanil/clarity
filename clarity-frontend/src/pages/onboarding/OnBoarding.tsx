@@ -1,18 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Target } from "lucide-react";
 import { goals } from "./helper/data";
 import { useUserStore } from "../../store/useUserStore";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
   const { updateIncomeGoal, loading, error } = useUserStore();
+  const { user } = useAuthStore();
 
   const [step, setStep] = useState<number>(1);
-  const [monthlyIncome, setMonthlyIncome] = useState<string>("");
+  const [monthlyIncome, setMonthlyIncome] = useState<string>(
+    user?.monthly_income != null
+      ? user.monthly_income.toString()
+      : ""
+  );
+
   const [goal, setGoal] = useState<
     "Awareness" | "Control" | "Peace" | ""
   >("");
+
+  useEffect(() => {
+    if (user) {
+      if (user.monthly_income != null) {
+        setMonthlyIncome(user.monthly_income.toString());
+      }
+
+      if (user.goal) {
+        setGoal(user.goal);
+      }
+    }
+  }, [user]);
+
+
+  useEffect(() => {
+    if (user?.monthly_income != null && user?.goal) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
+
 
   const handleNext = () => {
     if (!monthlyIncome || Number(monthlyIncome) <= 0) return;

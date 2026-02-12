@@ -51,7 +51,7 @@ export const LoginUser = catchAsync(async (req: Request<{}, {}, LoginInput>, res
         secure: false,
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000,
-        path: "/api/v1/refresh-token",
+        path: "/",
     });
 
     const userInfo = {
@@ -131,9 +131,17 @@ export const logoutUser = catchAsync(async (req: any, res: Response) => {
         user.refresh_token = null;
         await user.save();
 
+        // res.clearCookie("refreshToken", {
+        //     httpOnly: true,
+        //     secure: process.env.NODE_ENV === "production",
+        //     sameSite: "strict",
+        //     path: "/",
+        // });
+
         res.clearCookie("refreshToken", {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            // secure: process.env.NODE_ENV === "production",
+            secure: false,
             sameSite: "strict",
             path: "/",
         });
