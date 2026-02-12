@@ -7,14 +7,16 @@ import axiosInstance from "../../utils/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useExpenseStore } from "../../store/useExpenseStore";
+import ChatModal from "../../components/modals/chat/ChatModal";
 
 const Dashboard = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuthStore();
     const { expenses, fetchExpenses, addExpense, clearExpenses } = useExpenseStore();
-
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [openMenu, setOpenMenu] = useState<boolean>(false);
+    const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
+
 
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -50,14 +52,14 @@ const Dashboard = () => {
     };
 
 
-    const regretCategories = expenses.reduce((acc: any, exp) => {
+    const regretCategories = expenses.reduce((acc: Record<string, number>, exp) => {
         if (exp.mood === "Regret") {
             acc[exp.category] = (acc[exp.category] || 0) + 1;
         }
         return acc;
     }, {});
 
-    const moodCounts = expenses.reduce((acc: any, exp) => {
+    const moodCounts = expenses.reduce((acc: Record<string, number>, exp) => {
         acc[exp.mood] = (acc[exp.mood] || 0) + 1;
         return acc;
     }, {});
@@ -157,10 +159,10 @@ const Dashboard = () => {
                             </div>
                             <div className="flex justify-between items-center mb-4">
                                 <span className="text-2xl font-display font-bold text-clarity-charcoal">
-                                    ₹0
+                                    Rs 0
                                 </span>
                                 <span className="text-sm font-body text-stone-400">
-                                    of ₹{user?.monthly_income.toLocaleString()}
+                                    of Rs {user?.monthly_income.toLocaleString()}
                                 </span>
                             </div>
                             <p className="text-stone-400 text-sm font-body leading-relaxed">
@@ -231,10 +233,10 @@ const Dashboard = () => {
                             </div>
                             <div className="flex justify-between items-center mb-4">
                                 <span className="text-2xl font-display font-bold text-clarity-charcoal">
-                                    ₹{totalSpent.toLocaleString()}
+                                    R.S.{totalSpent.toLocaleString()}
                                 </span>
                                 <span className="text-sm font-body text-stone-500">
-                                    of ₹{user?.monthly_income.toLocaleString()}
+                                    of R.S.{user?.monthly_income.toLocaleString()}
                                 </span>
                             </div>
                             <p className="text-stone-600 text-sm font-body">
@@ -305,19 +307,31 @@ const Dashboard = () => {
                         </div>
                     </div>
                 )}
-
+                
                 <button
                     className="fixed bottom-8 right-8 bg-clarity-green text-white p-5 rounded-full shadow-2xl shadow-clarity-green/30 hover:bg-clarity-green/90 hover:scale-110 active:scale-95 transition-all group"
                     onClick={() => setIsModalOpen(true)}
                 >
                     <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" />
                 </button>
+                <button
+                    className="fixed bottom-8 right-28 bg-pink-500 text-white p-5 rounded-full shadow-2xl shadow-pink-500/30 hover:bg-pink-600 hover:scale-110 active:scale-95 transition-all group"
+                    onClick={() => setIsChatOpen(true)}
+                >
+                    <Heart className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" />
+                </button>
+
             </div>
             <AddExpenseModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onAddExpense={handleAddExpense}
             />
+            <ChatModal
+                isOpen={isChatOpen}
+                onClose={() => setIsChatOpen(false)}
+            />
+
         </div>
     );
 };
