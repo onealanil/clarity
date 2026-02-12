@@ -36,7 +36,7 @@ Clarity focuses on:
 
 ## Backend Status
 The backend is currently not deployed.
-I attempted to host it on my VPS, but due to technical issues on the server and time constraints, I couldn\u2019t complete the deployment.
+I attempted to host it on my VPS, but due to technical issues on the server and time constraints, I couldn't complete the deployment.
 I will be hosting the backend shortly.
 
 
