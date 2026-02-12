@@ -31,7 +31,13 @@ Clarity focuses on:
 - Define monthly income for context
 - No budget pressure – just awareness
 
+## Live Frontend:
+ https://clarity-anil.vercel.app/
 
+## Backend Status
+The backend is currently not deployed.
+I attempted to host it on my VPS, but due to technical issues on the server and time constraints, I couldn\u2019t complete the deployment.
+I will be hosting the backend shortly.
 
 
 # Tools and package,
